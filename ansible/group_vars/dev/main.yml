@@ -1,0 +1,61 @@
+############################################
+##                                        ##
+##     DEVELOPEMENT ENV PARAMETERS        ##
+##                                        ##
+############################################
+
+
+
+###########################
+##   SYSTEM PARAMETERS   ##
+###########################
+use_calife: false
+use_epel: true
+use_scl: true
+use_softwarecollections: true
+use_repo_doit: false
+remount_filesystems: false
+
+
+hebergement:          "local"
+vagrant:              true
+proxy_on:             false
+
+server:
+    download_path: /tmp
+
+system_timezone: "Europe/Paris"
+
+#############################
+##    MYSLQ Configuration  ##
+#############################
+mysql_databases:
+   - name: "application_data"
+     collation: utf8_general_ci
+     encoding: utf8
+     replicate: 1
+
+#############################
+##    vhost Configuration  ##
+#############################
+php_webserver_daemon: "nginx"
+nginx_vhosts:
+  - listen: "[::]:80"
+    server_name: "localhost"
+    server_name_redirect: "localhost"
+    root: "/vagrant/sources"
+    index: "index.php index.html index.htm"
+    error_page: " 404 /404.html"
+    access_log: " foo "
+    error_log: " foo "
+    state: "present"
+    template: "{{ nginx_vhost_template }}"
+    filename: "example.com.conf"
+    extra_parameters: |
+      location ~ \.php$ {
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          fastcgi_pass 127.0.0.1:9000;
+          fastcgi_index index.php;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          include fastcgi_params;
+      }
